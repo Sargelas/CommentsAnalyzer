@@ -22,21 +22,21 @@ def do_test(comments, answers, processor, print_statistics=False):
 
 
 def _print_statistics(total, mistakes_total, mistakes):
-    print("################\n")
-    print("#\n")
-    print("# Total examples count = %s\n" % total)
-    print("#\n")
-    print("# Total mistakes count = %s\n" % mistakes_total)
-    print("#\n")
-    print("# Total mistakes percentage = %s\n" % (mistakes_total / total))
-    print("#\n")
+    print("################")
+    print("#")
+    print("# Total examples count = %s" % total)
+    print("#")
+    print("# Total mistakes count = %s" % mistakes_total)
+    print("#")
+    print("# Total mistakes percentage = %s" % (mistakes_total / total))
+    print("#")
 
-    print("# Counts by mistake type:\n")
+    print("# Counts by mistake type:")
     for key, value in mistakes.items():
-        print("# " + _get_mistake_name(key) + ": " + str(value) + "\n")
+        print("# " + _get_mistake_name(key) + ": " + str(value) + "")
 
-    print("#\n")
-    print("################\n")
+    print("#")
+    print("################")
 
 
 def _get_mistake_name(expected_to_current):
