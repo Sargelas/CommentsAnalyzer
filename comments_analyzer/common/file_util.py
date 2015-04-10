@@ -5,6 +5,10 @@ from comments_analyzer.ai.model import Model
 
 SEPARATOR = '\t'
 
+WORD = 'word'
+SMILE = 'smile'
+PUNCTUATION = 'punctuation'
+
 
 def load_model(file_name):
     file = open(file_name, mode='r', encoding='utf-8')
@@ -12,28 +16,38 @@ def load_model(file_name):
     words_positions = collections.defaultdict(lambda: None)
     words_weights = collections.defaultdict(lambda: None)
 
-    full_data = collections.defaultdict(lambda: None)
+    smiles_positions = collections.defaultdict(lambda: None)
+
+    punctuation_positions = collections.defaultdict(lambda: None)
+
     for line in file.readlines():
-        chunks = line.split(SEPARATOR)
-        full_data[chunks[0]] = float(chunks[1])
+        chucks = line.split(SEPARATOR)
+        if chucks[0] == WORD:
+            words_weights[chucks[1]] = float(chucks[3])
+            words_positions[chucks[1]] = int(chucks[2])
 
-    weights = sorted(full_data.items(), key=lambda x: (abs(x[1]), x[0]), reverse=True)
+        elif chucks[0] == SMILE:
+            smiles_positions[chucks[1]] = int(chucks[2])
 
-    counter = 0
-    for data_chunk in weights:
-        words_positions[data_chunk[0]] = counter
-        words_weights[data_chunk[0]] = data_chunk[1]
-        counter += 1
+        elif chucks[0] == PUNCTUATION:
+            punctuation_positions[chucks[1]] = int(chucks[2])
 
     file.close()
 
-    return Model(words_positions, words_weights)
+    return Model(words_positions, words_weights, smiles_positions, punctuation_positions)
 
 
 def dump_model(model, file_name):
     file = open(file_name, mode='w', encoding='utf-8')
     for word, weight in model.words_feature_weights.items():
-        file.write(word + SEPARATOR + str(weight) + '\n')
+        position = model.get_word_feature_position(word)
+        file.write(WORD + SEPARATOR + word + SEPARATOR + str(position) + SEPARATOR + str(weight) + '\n')
+
+    for smile, position in model.smile_feature_position.items():
+        file.write(SMILE + SEPARATOR + smile + SEPARATOR + str(position) + SEPARATOR + '1' + '\n')
+
+    for punctuation, position in model.punctuation_feature_position.items():
+        file.write(PUNCTUATION + SEPARATOR + punctuation + SEPARATOR + str(position) + SEPARATOR + '1' + '\n')
 
     file.close()
 

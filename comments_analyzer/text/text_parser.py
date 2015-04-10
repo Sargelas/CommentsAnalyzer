@@ -61,12 +61,13 @@ class TextParser:
         " Get all known smiles from given text
         """
         if self.known_smiles is None:
-            return []
+            return {}
 
-        smiles = []
+        smiles = {}
         for smile in self.known_smiles:
-            for i in range(0, text.count(smile)):
-                smiles.append(smile)
+            smile_count = text.count(smile)
+            if smile_count > 0:
+                smiles[smile] = smile_count
 
         return smiles
 
@@ -75,11 +76,12 @@ class TextParser:
         " Get all known punctuation from given text
         """
         if self.known_punctuation is None:
-            return []
+            return {}
 
-        punctuation_symbols = []
+        punctuation_symbols = {}
         for symbol in self.known_punctuation:
-            for i in range(0, text.count(symbol)):
-                punctuation_symbols.append(symbol)
+            symbol_count = text.count(symbol)
+            if symbol_count > 0:
+                punctuation_symbols[symbol] = symbol_count
 
         return punctuation_symbols

@@ -10,7 +10,7 @@ from comments_analyzer.common.constants import NEGATIVE_TONALITY
 from comments_analyzer.common.constants import HAS_EMOTION
 from comments_analyzer.common.constants import NEUTRAL
 from comments_analyzer.sentiment_estimation import calculate_weights
-from comments_analyzer.ai.machine_learning import get_words_features
+from comments_analyzer.ai.machine_learning import get_features_vector
 from comments_analyzer.ai.model import Model
 
 
@@ -37,7 +37,7 @@ class Teacher:
     def _get_training_set(self):
         x = []
         for comment in self.comments:
-            x.append(get_words_features(comment, self.text_parser, self.model))  # only words used like features by now
+            x.append(get_features_vector(comment, self.text_parser, self.model))
 
         return x
 
@@ -103,4 +103,8 @@ def _prepare_model(weights, count_of_features):
         words_weights[data_chunk[0]] = data_chunk[1]
         counter += 1
 
-    return Model(words_positions, words_weights)
+    # hard coded by now
+    smiles_positions = {":)" : 0, ":(" : 1, ":'(" : 2}
+    punctuation_positions = {"?!" : 0}
+
+    return Model(words_positions, words_weights, smiles_positions, punctuation_positions)
