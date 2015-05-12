@@ -1,10 +1,5 @@
-import enchant
-
 from enchant.utils import trim_suggestions
 from enchant.utils import levenshtein
-
-
-RUSSIAN_DICTIONARY = enchant.Dict('ru_Ru')
 
 
 def improved_levenshtein_distance(s1, s2):
@@ -12,9 +7,10 @@ def improved_levenshtein_distance(s1, s2):
     return levenshtein(s1, s2)
 
 
-def correct(word):
-    if not RUSSIAN_DICTIONARY.check(word):
-        suggestions = RUSSIAN_DICTIONARY.suggest(word)
+def correct(word, model):
+    dictionary = model.get_dictionary()
+    if not dictionary.check(word):
+        suggestions = dictionary.suggest(word)
         if len(suggestions) == 0:   # words could be unknown even for spell checker
             return word
 

@@ -48,7 +48,7 @@ class TextParser:
         """
         corrected_words = []
         for word in words:
-            word = correct(word)
+            word = correct(word, self.language_model)
             if not ' ' in word:
                 corrected_words.append(word)
             else:
