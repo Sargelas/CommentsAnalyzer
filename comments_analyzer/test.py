@@ -10,10 +10,10 @@ def do_test(comments, answers, processor, print_statistics=False):
     mistakes_total = 0
 
     for comment, answer in zip(comments, answers):
-        prediction = processor.process(comment)
-        if answer != prediction:
+        metric = processor.process(comment)
+        if answer != metric.text_tonality:
             mistakes_total += 1
-            mistakes[(answer, prediction)] += 1
+            mistakes[(answer, metric.text_tonality)] += 1
 
     if print_statistics:
         _print_statistics(len(answers), mistakes_total, mistakes)

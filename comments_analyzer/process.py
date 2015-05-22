@@ -1,10 +1,11 @@
 from comments_analyzer.common.constants import POSITIVE_TONALITY
 from comments_analyzer.common.constants import NEUTRAL_TONALITY
 from comments_analyzer.common.constants import NEGATIVE_TONALITY
-
 from comments_analyzer.common.constants import HAS_EMOTION
 
-from comments_analyzer.ai.machine_learning import get_features_vector
+from comments_analyzer.common.metric import Metric
+
+from comments_analyzer.ai.machine_learning import parse_text
 
 
 class Processor:
@@ -15,12 +16,50 @@ class Processor:
         self.text_parser = text_parser
 
     def process(self, comment):
-        x = get_features_vector(comment, self.text_parser, self.model)
+        text = parse_text(comment, self.text_parser, self.model)
+
+        x = text.get_vector(self.model)
+        if not _has_detected_features(x):
+            return Metric(NEUTRAL_TONALITY)
+
         if self.has_emotions_classifier.predict(x) == HAS_EMOTION:
             # Do emotions processing
             if self.emotions_classifier.predict(x) == POSITIVE_TONALITY:
-                return POSITIVE_TONALITY
+                tonality = POSITIVE_TONALITY
             else:
-                return NEGATIVE_TONALITY
+                tonality = NEGATIVE_TONALITY
         else:
-            return NEUTRAL_TONALITY
+            tonality = NEUTRAL_TONALITY
+
+        key_words = {}
+        for word in text.words:
+            if not word.weight:
+                continue
+
+            key_words[word.plain_text] = word.weight
+
+        if len(key_words) == 0:
+            # just for double check
+            return Metric(tonality)
+
+        average_weight = 0
+        for word, weight in key_words.items():
+            average_weight += abs(weight)
+
+        average_weight /= len(key_words)
+
+        reduced_key_words = {}
+        for word, weight in key_words.items():
+            if abs(weight) >= average_weight:
+                reduced_key_words[word] = weight
+
+        return Metric(tonality, reduced_key_words)
+
+
+def _has_detected_features(x):
+    for value in x:
+        if value != 0:
+            return True
+
+    return False
+
