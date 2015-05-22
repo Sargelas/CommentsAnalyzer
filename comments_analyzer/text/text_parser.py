@@ -4,10 +4,11 @@ from comments_analyzer.text.spell_checker import correct
 
 
 class TextParser:
-    def __init__(self, language_model, known_smiles=None, known_punctuation=None):
+    def __init__(self, language_model, known_smiles=None, known_punctuation=None, correction_allowed=True):
         self.language_model = language_model
         self.known_smiles = known_smiles
         self.known_punctuation = known_punctuation
+        self.correction_allowed = correction_allowed
 
         # Required regular expression initialization
         self.clear_reg_exp = re.compile('[^' + self.language_model.get_known_letters() + ']')
@@ -46,6 +47,9 @@ class TextParser:
         """
         " Get list which contains all words in correct form
         """
+        if not self.correction_allowed:
+            return words
+
         corrected_words = []
         for word in words:
             word = correct(word, self.language_model)
