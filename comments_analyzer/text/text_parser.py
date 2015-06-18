@@ -29,7 +29,7 @@ class TextParser:
             if not word:
                 continue
 
-            words.append(word)
+            words.append(word.lower())
 
         return words
 
